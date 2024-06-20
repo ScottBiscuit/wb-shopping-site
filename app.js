@@ -31,18 +31,24 @@ app.get('/all-animals', (req, res) => {
 });
 
 app.get('/animal-details/:animalId', (req, res) => {
-  res.render('animal-details.html.njk', { animal: stuffedAnimalData.elephant });
+  const animalDetails = getAnimalDetails(req.params.animalId);
+  res.render('animal-details.html.njk', { animal: animalDetails });
 });
 
 app.get('/add-to-cart/:animalId', (req, res) => {
-  // TODO: Finish add to cart functionality
-  // The logic here should be something like:
-  // - check if a "cart" exists in the session, and create one (an empty
-  // object keyed to the string "cart") if not
-  // - check if the desired animal id is in the cart, and if not, put it in
-  // - increment the count for that animal id by 1
-  // - redirect the user to the cart page
-});
+  const sess = req.session;
+  const animalId = req.params.animalId;
+  if(!sess.cart) {
+    sess.cart = {};
+  }
+  if (!(animalId in sess.cart)) {
+    sess.cart[animalId] = 0;
+  }
+  sess.cart[animalId] += 1;
+  console.log(sess.cart);
+
+  res.redirect('/cart');
+})
 
 app.get('/cart', (req, res) => {
   // TODO: Display the contents of the shopping cart.
